@@ -1,0 +1,61 @@
+const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
+
+type RequestOptions = {
+  headers?: Record<string, string>;
+  signal?: AbortSignal;
+};
+
+export class ApiError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+async function request<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  options: RequestOptions = {},
+): Promise<T> {
+  const token = localStorage.getItem("auth_token");
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...options.headers,
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const init: RequestInit = { method, headers };
+  if (body !== undefined) {
+    init.body = JSON.stringify(body);
+  }
+  if (options.signal) {
+    init.signal = options.signal;
+  }
+
+  const res = await fetch(`${BASE_URL}${path}`, init);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new ApiError(res.status, text);
+  }
+
+  return res.json() as Promise<T>;
+}
+
+export const api = {
+  get: <T>(path: string, options?: RequestOptions) =>
+    request<T>("GET", path, undefined, options),
+  post: <T>(path: string, body: unknown, options?: RequestOptions) =>
+    request<T>("POST", path, body, options),
+  patch: <T>(path: string, body: unknown, options?: RequestOptions) =>
+    request<T>("PATCH", path, body, options),
+  delete: <T>(path: string, options?: RequestOptions) =>
+    request<T>("DELETE", path, undefined, options),
+};

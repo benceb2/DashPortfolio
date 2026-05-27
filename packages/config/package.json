@@ -1,0 +1,17 @@
+{
+  "name": "@dashportfolio/config",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./env": "./src/env.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}
