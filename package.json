@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "dashportfolio",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter @dashportfolio/api dev\" \"pnpm --filter @dashportfolio/web dev\"",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint ."
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "typescript": "^5.7.0"
+  }
+}
