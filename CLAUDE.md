@@ -44,7 +44,7 @@ Workspaces are defined in `pnpm-workspace.yaml`. Internal packages are reference
 | Query builder      | Kysely (no ORM)                                                              |
 | Migrations         | Plain SQL files in `apps/api/migrations/`, run via Supabase CLI              |
 | Validation         | Zod — shared schemas live in `packages/types`                                |
-| Auth               | Supabase Auth — frontend uses `@supabase/supabase-js` directly for sign-in/sign-out/session management. API validates JWTs with `jose` in middleware. |
+| Auth               | Supabase Auth — frontend uses `@supabase/supabase-js` directly for sign-in/sign-out/session management. API validates JWTs with `jose` in middleware. Uses publishable key (`sb_publishable_...`), not the legacy anon key. |
 | Database           | Postgres via Supabase — service role key only, Data API disabled             |
 | Background jobs    | BullMQ + Redis                                                               |
 | Frontend framework | Vue 3 (Composition API, `<script setup>`)                                    |
@@ -97,14 +97,18 @@ Workspaces are defined in `pnpm-workspace.yaml`. Internal packages are reference
 
 ## Database conventions
 
-- All tables have: `id uuid primary key default gen_random_uuid()`,
+- All tables have: `id text primary key` (app-generated prefixed IDs for log readability),
   `created_at timestamptz not null default now()`,
   `updated_at timestamptz not null default now()`.
 - Currency is always stored as the asset's native currency ISO code (e.g. `USD`, `GBP`).
   FX conversion happens at read time, never at write time.
 - Monetary amounts are stored as `numeric(20, 8)` — never floats.
-- Migrations are plain SQL files named `0001_description.sql`, `0002_description.sql`.
-  Never edit a migration that has already been applied. Add a new one.
+- **SQL style:** Keywords uppercase (`CREATE TABLE`, `SELECT`, `NOT NULL`, etc.), identifiers lowercase.
+- **Migrations during development:** While no migration has been applied to production,
+  edit `0001_initial_schema.sql` in place. Only start adding new numbered migration files
+  once the schema has been applied to a real environment (staging or production).
+- Once migrations are being applied: plain SQL files named `0001_description.sql`,
+  `0002_description.sql`. Never edit a migration that has already been applied. Add a new one.
 - RLS is enabled on all tables. Policies are defined even though the service role
   bypasses them — they serve as documentation and a safety net.
 - Supabase project is configured with Data API disabled, automatic RLS enabled,
