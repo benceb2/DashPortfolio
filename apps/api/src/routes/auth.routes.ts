@@ -27,7 +27,7 @@ const ErrorSchema = z.object({
 
 const loginRoute = createRoute({
   method: "post",
-  path: "/login",
+  path: "/tokens",
   request: {
     body: {
       content: {
@@ -77,8 +77,8 @@ authRouter.openapi(loginRoute, async (ctx) => {
 });
 
 const refreshRoute = createRoute({
-  method: "post",
-  path: "/refresh",
+  method: "put",
+  path: "/tokens",
   request: {
     body: {
       content: {
@@ -125,8 +125,8 @@ authRouter.openapi(refreshRoute, async (ctx) => {
 });
 
 const logoutRoute = createRoute({
-  method: "post",
-  path: "/logout",
+  method: "delete",
+  path: "/tokens",
   middleware: [authMiddleware] as const,
   security: [{ bearerAuth: [] }],
   responses: {

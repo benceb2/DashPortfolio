@@ -57,13 +57,13 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function login(email: string, password: string): Promise<void> {
-    const tokens = await api.post<TokenResponse>("/auth/login", { email, password });
+    const tokens = await api.post<TokenResponse>("/auth/tokens", { email, password });
     setTokens(tokens);
   }
 
   async function logout(): Promise<void> {
     try {
-      await api.post("/auth/logout", {});
+      await api.delete("/auth/tokens");
     } finally {
       clearTokens();
     }
@@ -73,7 +73,7 @@ export const useAuthStore = defineStore("auth", () => {
     const token = refreshToken.value;
     if (!token) return false;
     try {
-      const tokens = await api.post<TokenResponse>("/auth/refresh", { refresh_token: token });
+      const tokens = await api.put<TokenResponse>("/auth/tokens", { refresh_token: token });
       setTokens(tokens);
       return true;
     } catch {
