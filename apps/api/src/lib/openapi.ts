@@ -1,10 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import type { Env } from "../types/hono.js";
-import { authRouter } from "../routes/auth.js";
-import { holdingsRouter } from "../routes/holdings.js";
-import { assetsRouter } from "../routes/assets.js";
-import { pricesRouter } from "../routes/prices.js";
+import { authRouter } from "../routes/auth.routes.js";
+import { holdingsRouter } from "../routes/holdings.routes.js";
+import { assetsRouter } from "../routes/assets.routes.js";
+import { pricesRouter } from "../routes/prices.routes.js";
 
 export function createOpenAPIApp(): OpenAPIHono<Env> {
   const app = new OpenAPIHono<Env>();

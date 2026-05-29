@@ -1,3 +1,5 @@
+import { useAuthStore } from "../stores/auth.js";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 type RequestOptions = {
@@ -20,8 +22,11 @@ async function request<T>(
   path: string,
   body?: unknown,
   options: RequestOptions = {},
+  isRetry = false,
 ): Promise<T> {
-  const token = localStorage.getItem("auth_token");
+  // Lazily resolve store to avoid circular import issues at module init time
+  const authStore = useAuthStore();
+  const token = authStore.accessToken;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -41,9 +46,22 @@ async function request<T>(
 
   const res = await fetch(`${BASE_URL}${path}`, init);
 
+  if (res.status === 401 && !isRetry) {
+    const refreshed = await authStore.refresh();
+    if (refreshed) {
+      return request<T>(method, path, body, options, true);
+    }
+    // refresh() already cleared tokens; let router guard handle redirect
+    throw new ApiError(401, "Session expired");
+  }
+
   if (!res.ok) {
     const text = await res.text();
     throw new ApiError(res.status, text);
+  }
+
+  if (res.status === 204) {
+    return undefined as T;
   }
 
   return res.json() as Promise<T>;
