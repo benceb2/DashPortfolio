@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { AuthError } from "@supabase/supabase-js";
 import { useAuthStore } from "../stores/auth.js";
-import { ApiError } from "../lib/api.js";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -19,7 +19,7 @@ async function handleLogin(): Promise<void> {
     await authStore.login(email.value, password.value);
     await router.push({ name: "dashboard" });
   } catch (err) {
-    if (err instanceof ApiError && err.status === 401) {
+    if (err instanceof AuthError && err.status === 400) {
       errorMsg.value = "Invalid email or password.";
     } else {
       errorMsg.value = "Something went wrong. Please try again.";

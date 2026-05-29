@@ -18,8 +18,11 @@ export const router = createRouter({
   ],
 });
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore();
+  // Wait for INITIAL_SESSION to fire before making auth decisions, so a hard
+  // reload to a protected route doesn't falsely redirect to /login.
+  await auth.ready;
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: "login" };
   }

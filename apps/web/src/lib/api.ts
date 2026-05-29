@@ -1,4 +1,4 @@
-import { useAuthStore } from "../stores/auth.js";
+import { supabase } from "./supabase.js";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
@@ -22,11 +22,9 @@ async function request<T>(
   path: string,
   body?: unknown,
   options: RequestOptions = {},
-  isRetry = false,
 ): Promise<T> {
-  // Lazily resolve store to avoid circular import issues at module init time
-  const authStore = useAuthStore();
-  const token = authStore.accessToken;
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -46,15 +44,6 @@ async function request<T>(
 
   const res = await fetch(`${BASE_URL}${path}`, init);
 
-  if (res.status === 401 && !isRetry) {
-    const refreshed = await authStore.refresh();
-    if (refreshed) {
-      return request<T>(method, path, body, options, true);
-    }
-    // refresh() already cleared tokens; let router guard handle redirect
-    throw new ApiError(401, "Session expired");
-  }
-
   if (!res.ok) {
     const text = await res.text();
     throw new ApiError(res.status, text);
@@ -72,8 +61,6 @@ export const api = {
     request<T>("GET", path, undefined, options),
   post: <T>(path: string, body: unknown, options?: RequestOptions) =>
     request<T>("POST", path, body, options),
-  put: <T>(path: string, body: unknown, options?: RequestOptions) =>
-    request<T>("PUT", path, body, options),
   patch: <T>(path: string, body: unknown, options?: RequestOptions) =>
     request<T>("PATCH", path, body, options),
   delete: <T>(path: string, options?: RequestOptions) =>

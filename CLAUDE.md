@@ -44,7 +44,7 @@ Workspaces are defined in `pnpm-workspace.yaml`. Internal packages are reference
 | Query builder      | Kysely (no ORM)                                                              |
 | Migrations         | Plain SQL files in `apps/api/migrations/`, run via Supabase CLI              |
 | Validation         | Zod — shared schemas live in `packages/types`                                |
-| Auth               | Supabase Auth (JWT) — verified in Hono middleware, never trusted client-side |
+| Auth               | Supabase Auth — frontend uses `@supabase/supabase-js` directly for sign-in/sign-out/session management. API validates JWTs with `jose` in middleware. |
 | Database           | Postgres via Supabase — service role key only, Data API disabled             |
 | Background jobs    | BullMQ + Redis                                                               |
 | Frontend framework | Vue 3 (Composition API, `<script setup>`)                                    |
@@ -118,13 +118,15 @@ Workspaces are defined in `pnpm-workspace.yaml`. Internal packages are reference
   Never call fetch directly in a component or store.
 - Mobile-first. Every layout is designed for a ~390px viewport first.
   Desktop is an enhancement.
-- No direct Supabase client usage in the frontend. Auth tokens are managed via
-  the API client; the Supabase JS SDK is not installed in `apps/web`.
+- `@supabase/supabase-js` is used in `apps/web` for auth only (sign-in, sign-out,
+  session management via `onAuthStateChange`). The Supabase client instance lives in
+  `src/lib/supabase.ts` and is imported where needed — never instantiated inline.
 
 ## What not to do
 
 - Do not install Prisma or any other ORM.
-- Do not install the Supabase JS client in `apps/web`.
+- Do not install `@supabase/supabase-js` in `apps/api` — the API has no need for it. JWT validation uses `jose` directly.
+- Do not use the Supabase client for anything other than auth in `apps/web` — no direct DB queries, no storage, no realtime from the frontend.
 - Do not access `process.env` directly — use the validated env module.
 - Do not add a `src/index.ts` barrel file.
 - Do not use `any`.

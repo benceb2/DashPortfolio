@@ -22,7 +22,6 @@
     "@hono/node-server": "^1.13.0",
     "@hono/swagger-ui": "^0.4.0",
     "@hono/zod-openapi": "^0.18.0",
-    "@supabase/auth-helpers-shared": "^0.7.0",
     "bullmq": "^5.0.0",
     "dotenv": "^16.4.0",
     "hono": "^4.6.0",
