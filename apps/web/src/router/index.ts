@@ -6,14 +6,20 @@ export const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "dashboard",
-      component: () => import("../views/DashboardView.vue"),
-      meta: { requiresAuth: true },
-    },
-    {
-      path: "/login",
-      name: "login",
-      component: () => import("../views/LoginView.vue"),
+      component: () => import("../layouts/MainLayout.vue"),
+      children: [
+        {
+          path: "",
+          name: "dashboard",
+          component: () => import("../views/DashboardView.vue"),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: "login",
+          name: "login",
+          component: () => import("../views/LoginView.vue"),
+        },
+      ],
     },
   ],
 });
