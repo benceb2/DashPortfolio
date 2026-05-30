@@ -130,6 +130,26 @@ Workspaces are defined in `pnpm-workspace.yaml`. Internal packages are reference
   session management via `onAuthStateChange`). The Supabase client instance lives in
   `src/lib/supabase.ts` and is imported where needed — never instantiated inline.
 
+## Date and timestamp handling
+
+- All timestamps are **UTC throughout the stack**. The DB uses `TIMESTAMPTZ` (always stored as
+  UTC). The API always sends UTC ISO 8601 strings. The frontend converts to local time for
+  display only — never store or transmit local time.
+- Treat timestamps as **ISO 8601 strings** by default. Most timestamp columns (`created_at`,
+  `updated_at`, `snapshotted_at`) are audit/display fields — render them, store them, compare
+  them as strings. No `Date` object needed.
+- The `pg` driver returns `timestamptz` columns as JavaScript `Date` objects at runtime. Call
+  `.toISOString()` at the route boundary to convert to string. Never double-cast
+  (`as unknown as Date`).
+- Kysely types reflect this: `Timestamp = ColumnType<Date, Date | string, Date | string>` —
+  select side is `Date` (what pg gives you), write side accepts `Date | string`.
+- `price_candles.period_start` / `period_end` are business-logic timestamps that will eventually
+  need real date arithmetic. Use `Temporal` (via `@js-temporal/polyfill`) when that work begins,
+  not before. Do not reach for native `Date` for arithmetic — it has well-known footguns around
+  timezone coercion and DST.
+- `price_candles` has no `updated_at` column by design — rows are immutable once written by the
+  background sync job. Revisit if Polygon.io corrections require it.
+
 ## What not to do
 
 - Do not install Prisma or any other ORM.

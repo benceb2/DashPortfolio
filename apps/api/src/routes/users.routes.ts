@@ -52,8 +52,8 @@ usersRouter.openapi(getMeRoute, async (ctx) => {
       id: row.id,
       displayName: row.display_name,
       baseCurrency: row.base_currency,
-      createdAt: (row.created_at as unknown as Date).toISOString(),
-      updatedAt: (row.updated_at as unknown as Date).toISOString(),
+      createdAt: row.created_at.toISOString(),
+      updatedAt: row.updated_at.toISOString(),
     },
     200,
   );
