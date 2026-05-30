@@ -1,4 +1,7 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
+import { supabase } from "./supabase.js";
+import { env } from "./env.js";
+
+const BASE_URL = env.VITE_API_BASE_URL;
 
 type RequestOptions = {
   headers?: Record<string, string>;
@@ -21,7 +24,11 @@ async function request<T>(
   body?: unknown,
   options: RequestOptions = {},
 ): Promise<T> {
-  const token = localStorage.getItem("auth_token");
+  // getSession() returns the locally-cached session; the supabase-js client
+  // automatically refreshes the access token before it expires via its
+  // background timer, so this is safe for attaching to outgoing requests.
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -44,6 +51,10 @@ async function request<T>(
   if (!res.ok) {
     const text = await res.text();
     throw new ApiError(res.status, text);
+  }
+
+  if (res.status === 204) {
+    return undefined as T;
   }
 
   return res.json() as Promise<T>;
