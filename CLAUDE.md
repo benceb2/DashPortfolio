@@ -2,6 +2,8 @@
 
 **IMPORTANT**: Never commit code on users behalf
 
+**IMPORTANT**: When investigating third-party library behaviour, search for and read the official docs first. Only fall back to reading `node_modules` source if the docs are inaccessible or don't answer the question. Docs surface intent, caveats, and version differences that source alone won't.
+
 ## PR descriptions
 
 Keep them short. Title: one line naming the feature. Body: bullet points, each starting with a present-tense verb ("adds", "replaces", "removes", "renames"). No over-explaining or selling — just state what changed.

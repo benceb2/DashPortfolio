@@ -11,9 +11,10 @@ export const useAuthStore = defineStore("auth", () => {
   // Falls back after 10 s in case the Supabase client stalls on initialization
   // (e.g. stale stored session + unreachable URL blocks the internal lock).
   let resolveReady!: () => void;
+  let readyTimeoutId: ReturnType<typeof setTimeout>;
   const ready = new Promise<void>((resolve) => {
     resolveReady = resolve;
-    setTimeout(resolve, 10_000);
+    readyTimeoutId = setTimeout(resolve, 10_000);
   });
 
   // onAuthStateChange emits INITIAL_SESSION automatically after the client
@@ -26,6 +27,7 @@ export const useAuthStore = defineStore("auth", () => {
   });
 
   function dispose(): void {
+    clearTimeout(readyTimeoutId);
     subscription.unsubscribe();
   }
 
@@ -35,7 +37,8 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function logout(): Promise<void> {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
   }
 
   return { user, isAuthenticated, ready, login, logout, dispose };

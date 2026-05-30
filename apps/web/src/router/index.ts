@@ -32,4 +32,7 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: "login" };
   }
+  if (to.name === "login" && auth.isAuthenticated) {
+    return { name: "dashboard" };
+  }
 });
