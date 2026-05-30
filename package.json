@@ -12,10 +12,7 @@
     "node": ">=24.0.0",
     "pnpm": ">=11.0.0"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": ["@parcel/watcher"]
-  },
-  "devDependencies": {
+"devDependencies": {
     "concurrently": "^9.0.0",
     "typescript": "^5.7.0"
   }
