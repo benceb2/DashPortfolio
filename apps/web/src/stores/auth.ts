@@ -7,9 +7,7 @@ export const useAuthStore = defineStore("auth", () => {
   const user = ref<User | null>(null);
   const isAuthenticated = computed(() => user.value !== null);
 
-  // Resolves once INITIAL_SESSION has fired so router guards can await it.
-  // Falls back after 10 s in case the Supabase client stalls on initialization
-  // (e.g. stale stored session + unreachable URL blocks the internal lock).
+  // Resolves once INITIAL_SESSION has fired so router guards can await it
   let resolveReady!: () => void;
   let readyTimeoutId: ReturnType<typeof setTimeout>;
   const ready = new Promise<void>((resolve) => {
@@ -17,11 +15,10 @@ export const useAuthStore = defineStore("auth", () => {
     readyTimeoutId = setTimeout(resolve, 10_000);
   });
 
-  // onAuthStateChange emits INITIAL_SESSION automatically after the client
-  // initialises from storage — no separate getSession() call needed.
   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
     user.value = session?.user ?? null;
     if (event === "INITIAL_SESSION") {
+      clearTimeout(readyTimeoutId);
       resolveReady();
     }
   });
