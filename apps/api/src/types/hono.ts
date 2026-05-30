@@ -1,7 +1,5 @@
-export type Variables = {
-  userId: string;
-};
+import type { JwtVariables } from "hono/jwt";
 
 export type Env = {
-  Variables: Variables;
+  Variables: JwtVariables;
 };

@@ -2,6 +2,10 @@
 
 **IMPORTANT**: Never commit code on users behalf
 
+## PR descriptions
+
+Keep them short. Title: one line naming the feature. Body: bullet points, each starting with a present-tense verb ("adds", "replaces", "removes", "renames"). No over-explaining or selling — just state what changed.
+
 ## Node.js version
 
 This project requires Node.js 24 (see `.nvmrc`). The Bash tool spawns a non-interactive shell
