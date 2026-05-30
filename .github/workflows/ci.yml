@@ -72,5 +72,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run API tests
-        run: pnpm --filter @dashportfolio/api test
+      - name: Run tests
+        run: pnpm -r test
