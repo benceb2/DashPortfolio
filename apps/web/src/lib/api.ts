@@ -23,6 +23,9 @@ async function request<T>(
   body?: unknown,
   options: RequestOptions = {},
 ): Promise<T> {
+  // getSession() returns the locally-cached session; the supabase-js client
+  // automatically refreshes the access token before it expires via its
+  // background timer, so this is safe for attaching to outgoing requests.
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
 

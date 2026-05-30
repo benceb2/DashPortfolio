@@ -19,8 +19,8 @@ async function handleLogin(): Promise<void> {
     await authStore.login(email.value, password.value);
     await router.push({ name: "dashboard" });
   } catch (err) {
-    if (err instanceof AuthError && err.status === 400) {
-      errorMsg.value = "Invalid email or password.";
+    if (err instanceof AuthError) {
+      errorMsg.value = err.message;
     } else {
       errorMsg.value = "Something went wrong. Please try again.";
     }
