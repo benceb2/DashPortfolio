@@ -1,6 +1,7 @@
 import { supabase } from "./supabase.js";
+import { env } from "./env.js";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
+const BASE_URL = env.VITE_API_BASE_URL;
 
 type RequestOptions = {
   headers?: Record<string, string>;

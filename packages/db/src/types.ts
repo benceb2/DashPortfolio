@@ -56,7 +56,6 @@ export interface PriceCandlesTable {
   period_start: Timestamp;
   period_end: Timestamp;
   created_at: Generated<Timestamp>;
-  updated_at: Generated<Timestamp>;
 }
 
 export interface PortfolioSnapshotsTable {

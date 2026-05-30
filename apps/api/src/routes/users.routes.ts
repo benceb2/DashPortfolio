@@ -21,6 +21,12 @@ const getMeRoute = createRoute({
       description: "The authenticated user's profile",
       content: { "application/json": { schema: UserSchema } },
     },
+    401: {
+      description: "Missing or invalid authentication token",
+      content: {
+        "application/json": { schema: z.object({ error: z.string() }) },
+      },
+    },
     404: {
       description: "User profile not found",
       content: {
